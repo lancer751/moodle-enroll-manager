@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,21 @@ const DashboardPage = () => {
   const [courseFilter, setCourseFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    async function fetchMoodleUsers() {
+      try {
+        const res = await fetch("http://localhost:5000/api/moodle-users")
+        const data = await res.json()
+        console.log("Moodle users data:", data)
+        
+      } catch (error) {
+        console.error("Error fetching Moodle users:", error)
+      }
+    }
+
+    fetchMoodleUsers()
+  }, [])
 
   const filtered = useMemo(() => {
     return mockStudents.filter((s) => {
