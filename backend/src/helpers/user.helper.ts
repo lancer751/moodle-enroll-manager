@@ -1,6 +1,6 @@
 import { MOODLE_TOKEN, MOODLE_URL } from "../config/connection";
 import axios from "axios";
-import type { MoodleUser } from "../types/user.moodle";
+import type { MoodleUser } from "../types/user";
 import type { RawUserMoodle } from "../types/user";
 
 export async function fetchUsersFromModdle(): Promise<RawUserMoodle[]> {
@@ -37,6 +37,7 @@ export async function fetchUsersFromModdle(): Promise<RawUserMoodle[]> {
             city: user.city,
             confirmed: user.confirmed,
             suspended: user.suspended,
+            moodleId: user.id,
             first_access: user.firstaccess
         }))
     } catch (error) {

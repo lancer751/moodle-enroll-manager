@@ -1,12 +1,10 @@
 export interface User {
     id: number;
+    dni: string | null;
     username: string;
     firstName: string;
     lastName: string;
-    fullName: string;
     email: string;
-    city: string;
-    confirmed: boolean;
-    suspended: boolean;
-    first_access: number;
+    moodleId?: number;
+    phone: string | null;
 }

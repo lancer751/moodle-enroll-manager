@@ -1,9 +1,17 @@
 import type { Request, Response } from "express";
 import { fetchUsersFromModdle } from "../helpers/user.helper";
 import { prisma } from "../config/connection";
+import type { Student } from "../types/user";
 
+interface StudentResults {
+  data: Student[],
+  page: number,
+  limit: number,
+  total: number,
+  hasMore: boolean
+}
 
-export async function getStudents(req: Request, res: Response) {
+export async function getStudents(req: Request, res: Response): Promise<Response<StudentResults> | Response<{ error: string }>> {
   const page = Math.max(1, Number(req.query.page ?? 1));
   const limit = Math.min(200, Number(req.query.limit ?? 20)); // prevent abusive large limits
   const skip = (page - 1) * limit;
@@ -69,7 +77,7 @@ export async function syncMoodleUsers(req: Request, res: Response) {
     const byEmail = new Map<string, typeof existingStudents[number]>();
 
     for (const s of existingStudents) {
-      if (s.moodleId != null) byMoodleId.set(s.moodleId, s);
+      if (s.moodleId !== null) byMoodleId.set(s.moodleId, s);
       if (s.email) byEmail.set(s.email, s);
     }
 

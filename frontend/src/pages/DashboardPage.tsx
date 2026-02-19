@@ -9,6 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { mockStudents } from "@/lib/mock-data";
 import { COURSES } from "@/lib/types";
 import { Search, UserPlus, Users, CheckCircle2, Clock, GraduationCap } from "lucide-react";
+import { User } from "@/types/user";
 
 const PAGE_SIZE = 5;
 
@@ -18,43 +19,36 @@ const DashboardPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
 
+  const [courses, setCourses] = useState([])
+  const [students, setStudents] = useState<User[]>([])
+
   useEffect(() => {
     async function fetchMoodleUsers() {
       try {
-        const res = await fetch("http://localhost:5000/api/moodle-users")
-        const data = await res.json()
-        console.log("Moodle users data:", data)
-        
+        const res = await fetch("http://localhost:5000/api/users")
+        const students = await res.json()
+        setStudents(students.data)
       } catch (error) {
-        console.error("Error fetching Moodle users:", error)
+        console.error("Error fetching Moodle students:", error)
       }
     }
 
     fetchMoodleUsers()
   }, [])
 
-  const filtered = useMemo(() => {
-    return mockStudents.filter((s) => {
-      const term = search.toLowerCase();
-      const matchesSearch =
-        !term ||
-        `${s.firstName} ${s.lastName}`.toLowerCase().includes(term) ||
-        s.dni.toLowerCase().includes(term) ||
-        s.username.toLowerCase().includes(term);
-      const matchesCourse = courseFilter === "all" || s.course === courseFilter;
-      const matchesStatus = statusFilter === "all" || s.status === statusFilter;
-      return matchesSearch && matchesCourse && matchesStatus;
-    });
-  }, [search, courseFilter, statusFilter]);
+  useEffect(() => {
+    async function fetchMoodleCourses() {
+      try {
+        const res = await fetch("http://localhost:5000/api/courses")
+        const courses = await res.json()
+        setCourses(courses.data)
+      } catch (error) {
+        console.error("Error fetching Moodle courses:", error)
+      }
+    }
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const stats = {
-    total: mockStudents.length,
-    matriculados: mockStudents.filter((s) => s.status === "Matriculado").length,
-    enEspera: mockStudents.filter((s) => s.status === "En espera").length,
-  };
+    fetchMoodleCourses()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -76,26 +70,6 @@ const DashboardPage = () => {
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        {[
-          { label: "Total Estudiantes", value: stats.total, icon: Users, color: "text-primary" },
-          { label: "Matriculados", value: stats.matriculados, icon: CheckCircle2, color: "text-success" },
-          { label: "En Espera", value: stats.enEspera, icon: Clock, color: "text-warning" },
-        ].map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className={`rounded-lg bg-muted p-2.5 ${stat.color}`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-2xl font-bold font-display">{stat.value}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
       {/* Filters */}
       <Card>
@@ -107,6 +81,7 @@ const DashboardPage = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row">
+            {/* search nav to looking for students */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -116,25 +91,16 @@ const DashboardPage = () => {
                 className="pl-9"
               />
             </div>
+            {/* filter to choose the course */}
             <Select value={courseFilter} onValueChange={(v) => { setCourseFilter(v); setPage(1); }}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Todos los cursos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-64">
                 <SelectItem value="all">Todos los cursos</SelectItem>
-                {COURSES.map((c) => (
-                  <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                {courses?.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-              <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Todos los estados" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Matriculado">Matriculado</SelectItem>
-                <SelectItem value="En espera">En espera</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -145,33 +111,27 @@ const DashboardPage = () => {
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead>Nombre y Apellidos</TableHead>
-                  <TableHead>Curso</TableHead>
                   <TableHead>Usuario</TableHead>
                   <TableHead>DNI</TableHead>
                   <TableHead>Teléfono</TableHead>
-                  <TableHead>Estado</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginated.length === 0 ? (
+                {students.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
-                      No se encontraron estudiantes.
+                      No se encontraron más estudiantes.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginated.map((s) => (
+                  students.map((s) => (
                     <TableRow key={s.id}>
-                      <TableCell className="font-medium">
-                        {s.firstName} {s.lastName}
+                      <TableCell className="font-medium capitalize">
+                        {s.firstName.toLowerCase()} {s.lastName.toLowerCase()}
                       </TableCell>
-                      <TableCell>{s.course}</TableCell>
                       <TableCell className="font-mono text-sm">{s.username}</TableCell>
-                      <TableCell>{s.dni}</TableCell>
-                      <TableCell>{s.phone}</TableCell>
-                      <TableCell>
-                        <StatusBadge status={s.status} />
-                      </TableCell>
+                      <TableCell>{s.dni ?? "No registrado"}</TableCell>
+                      <TableCell>{s.phone ?? "No registrado"}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -179,8 +139,8 @@ const DashboardPage = () => {
             </Table>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {/* Pagination
+          {students.length > 1 && (
             <div className="flex items-center justify-between pt-2">
               <p className="text-sm text-muted-foreground">
                 Mostrando {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
@@ -204,7 +164,7 @@ const DashboardPage = () => {
                 </Button>
               </div>
             </div>
-          )}
+          )} */}
         </CardContent>
       </Card>
     </div>

@@ -10,8 +10,15 @@
 */
 
 export const EnrollmentStatus = {
-  MATRICULADO: 'MATRICULADO',
-  EN_ESPERA: 'EN_ESPERA'
+  PENDING: 'PENDING',
+  WAITING_LIST: 'WAITING_LIST',
+  APPROVED: 'APPROVED',
+  ENROLLED: 'ENROLLED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+  DROPPED: 'DROPPED',
+  COMPLETED: 'COMPLETED',
+  SUSPENDED: 'SUSPENDED'
 } as const
 
 export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
