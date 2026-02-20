@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { COURSES } from "@/lib/types";
+import { COURSES } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, ArrowLeft } from "lucide-react";
 import { z } from "zod";

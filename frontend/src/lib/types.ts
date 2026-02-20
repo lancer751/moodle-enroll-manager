@@ -1,24 +1,87 @@
+// ──────────────────────────────────────────────
+// Enrollment status — mirrors backend EnrollmentStatus enum
+// ──────────────────────────────────────────────
+export type EnrollmentStatus =
+  | "PENDING"
+  | "WAITING_LIST"
+  | "APPROVED"
+  | "ENROLLED"
+  | "REJECTED"
+  | "CANCELLED"
+  | "DROPPED"
+  | "COMPLETED"
+  | "SUSPENDED";
+
+export type MoodleEnrollmentStatus = "NOT_ENROLLED" | "ENROLLED" | "SUSPENDED";
+export type CourseAccessStatus = "ACTIVE" | "DISABLED";
+
+// ──────────────────────────────────────────────
+// Student — mirrors backend Student model
+// ──────────────────────────────────────────────
 export interface Student {
-  id: string;
+  id: number;
+  moodleId: number;
   firstName: string;
   lastName: string;
-  dni: string;
-  phone: string;
+  fullName: string;
   username: string;
-  course: string;
-  status: "Matriculado" | "En espera";
+  email: string;
+  dni: string | null;
+  phone: string | null;
+  status: EnrollmentStatus;
   createdAt: string;
+  updatedAt: string;
 }
 
+// ──────────────────────────────────────────────
+// Course — mirrors backend Course model
+// ──────────────────────────────────────────────
 export interface Course {
-  id: string;
+  id: number;
+  moodleCourseId: number;
   name: string;
+  description: string | null;
+  startDate: string;
+  endDate: string;
+  category: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const COURSES: Course[] = [
-  { id: "1", name: "Matemáticas Básicas" },
-  { id: "2", name: "Programación Web" },
-  { id: "3", name: "Diseño Gráfico" },
-  { id: "4", name: "Inglés Intermedio" },
-  { id: "5", name: "Administración de Empresas" },
-];
+// ──────────────────────────────────────────────
+// Enrollment — mirrors backend Enrollment model
+// ──────────────────────────────────────────────
+export interface Enrollment {
+  id: number;
+  studentId: number;
+  courseId: number;
+  status: EnrollmentStatus;
+  moodleEnrollmentStatus: MoodleEnrollmentStatus;
+  courseAccessStatus: CourseAccessStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ──────────────────────────────────────────────
+// Derived / view types used by UI
+// ──────────────────────────────────────────────
+
+/** Student row inside a Course Detail page */
+export interface CourseStudent extends Student {
+  enrollmentId: number;
+  enrollmentStatus: EnrollmentStatus;
+  moodleEnrollmentStatus: MoodleEnrollmentStatus;
+  courseAccessStatus: CourseAccessStatus;
+}
+
+/** Course card enriched with student count */
+export interface CourseWithStats extends Course {
+  studentCount: number;
+  enrolledCount: number;
+  waitingCount: number;
+}
+
+// ──────────────────────────────────────────────
+// Legacy alias kept for backward-compat (EnrollPage)
+// ──────────────────────────────────────────────
+export const COURSES: { id: string; name: string }[] = [];
