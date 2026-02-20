@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:frontend": "cd frontend && bun dev",
+    "build:dev": "cd frontend && npx vite build --mode development",
     "start:backend": "cd backend && bun dev"
   },
   "keywords": [],
