@@ -21,7 +21,7 @@ export interface MoodleUser {
     profileimageurl: string
 }
 
-export type RawUserMoodle ={
+export type RawUserMoodle = {
     id: number,
     username: string,
     firstName: string,
@@ -35,3 +35,5 @@ export interface Student extends RawUserMoodle {
     dni: string | null;
     phone: string | null;
 }
+
+export type NewStudent = Pick<MoodleUser, "id" | "username" | "email" | "firstname" | "lastname"> & { "password": string }

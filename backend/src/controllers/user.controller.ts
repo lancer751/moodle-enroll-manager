@@ -17,6 +17,9 @@ export async function getStudents(req: Request, res: Response): Promise<Response
   const skip = (page - 1) * limit;
 
   try {
+
+    // later, here will be selecting the status of the user not of the enrollment.
+    // we only will tell if the user was added to Moodle
     const [students, total] = await Promise.all([
       prisma.student.findMany({
         skip,
