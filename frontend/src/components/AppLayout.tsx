@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, UserPlus, LayoutDashboard, BookOpen } from "lucide-react";
+import { GraduationCap, UserPlus, LayoutDashboard, BookOpen, Users } from "lucide-react";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const navItems = [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/students", label: "Estudiantes", icon: Users },
     { to: "/courses", label: "Cursos", icon: BookOpen },
     { to: "/enroll", label: "Nueva Matrícula", icon: UserPlus },
   ];
