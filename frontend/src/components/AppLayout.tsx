@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, UserPlus, LayoutDashboard, BookOpen, Users } from "lucide-react";
+import { GraduationCap, UserPlus, LayoutDashboard, BookOpen, Users, Receipt, Settings } from "lucide-react";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -8,7 +8,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
     { to: "/students", label: "Estudiantes", icon: Users },
     { to: "/courses", label: "Cursos", icon: BookOpen },
-    { to: "/enroll", label: "Nueva Matrícula", icon: UserPlus },
+    { to: "/enrollments", label: "Matrículas", icon: Receipt },
+    { to: "/course-management", label: "Gestión", icon: Settings },
+    { to: "/enroll", label: "Nueva", icon: UserPlus },
   ];
 
   return (
