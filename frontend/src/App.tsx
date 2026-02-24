@@ -11,6 +11,8 @@ import EnrollPage from "@/pages/EnrollPage";
 import CoursesPage from "@/pages/CoursesPage";
 import CourseDetailPage from "@/pages/CourseDetailPage";
 import EnrollSuccessPage from "@/pages/EnrollSuccessPage";
+import EnrollmentsPage from "@/pages/EnrollmentsPage";
+import CourseManagementPage from "@/pages/CourseManagementPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/enroll/success" element={<EnrollSuccessPage />} />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+            <Route path="/enrollments" element={<EnrollmentsPage />} />
+            <Route path="/course-management" element={<CourseManagementPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>

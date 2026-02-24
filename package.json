@@ -14,6 +14,12 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "backend": "^0.0.0"
+    "autoprefixer": "^10.4.24",
+    "backend": "^0.0.0",
+    "postcss": "^8.5.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.19",
+    "tailwindcss-animate": "^1.0.7"
   }
 }
