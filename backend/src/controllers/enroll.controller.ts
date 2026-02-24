@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
-import { createNewStudentModdle, enrollStudentsInMoodle } from "../services/enroll.service";
-import type { EnrollmentRequest, CreateAndEnrollRequest } from "../types/user";
+import { enrollStudentsInMoodle } from "../services/enroll.service";
+import type { CreateAndEnrollRequest } from "../types/user";
+import { createNewStudentModdle, getMoodleStudentByEmail } from "../services/student.service";
 
 // Default role ID for student enrollment in Moodle
 const DEFAULT_STUDENT_ROLE_ID = 5;
@@ -20,6 +21,33 @@ export async function createAndEnrollStudent(req: Request, res: Response) {
         if (!enrollmentData.courseid) {
             return res.status(400).json({
                 error: "Missing required enrollment field: courseid is required"
+            });
+        }
+
+        const existingStudent = await getMoodleStudentByEmail(enrollmentData.email)
+
+        // If student already exists, enroll them directly without trying to create a new account
+        if(existingStudent.success && existingStudent.users[0]) {
+            const existingUser = existingStudent.users[0];
+            const roleid = enrollmentData.roleid || DEFAULT_STUDENT_ROLE_ID;
+            const enrollmentResult = await enrollStudentsInMoodle({
+                userid: existingUser.id,
+                courseid: enrollmentData.courseid,
+                roleid
+            });
+            if (!enrollmentResult.success) {
+                return res.status(400).json({
+                    error: `Student already exists but enrollment failed: ${enrollmentResult.error}`
+                });
+            }
+            return res.status(200).json({
+                message: "Student already existed and was enrolled successfully",
+                data: {
+                    userid: existingUser.id,
+                    username: existingUser.username,
+                    courseid: enrollmentData.courseid,
+                    roleid
+                }
             });
         }
 
@@ -66,47 +94,5 @@ export async function createAndEnrollStudent(req: Request, res: Response) {
     } catch (error) {
         console.error("createAndEnrollStudent failed:", error);
         res.status(500).json({ error: "Failed to create and enroll the student" });
-    }
-}
-
-// Enroll an existing student in a course
-export async function enrollStudentInCourse(req: Request, res: Response) {
-    try {
-        const enrollmentData: EnrollmentRequest = req.body;
-
-        // Validate required fields
-        if (!enrollmentData.userid || !enrollmentData.courseid) {
-            return res.status(400).json({
-                error: "Missing required fields: userid and courseid are required"
-            });
-        }
-
-        // Use default role ID if not provided
-        const roleid = enrollmentData.roleid || DEFAULT_STUDENT_ROLE_ID;
-
-        // Call enrollment service
-        const result = await enrollStudentsInMoodle({
-            userid: enrollmentData.userid,
-            courseid: enrollmentData.courseid,
-            roleid
-        });
-
-        if (!result.success) {
-            return res.status(400).json({
-                error: result.error
-            });
-        }
-
-        return res.status(200).json({
-            message: "Student enrolled successfully",
-            data: {
-                userid: enrollmentData.userid,
-                courseid: enrollmentData.courseid,
-                roleid
-            }
-        });
-    } catch (error) {
-        console.error("enrollStudentInCourse failed:", error);
-        res.status(500).json({ error: "Failed to enroll the student" });
     }
 }
