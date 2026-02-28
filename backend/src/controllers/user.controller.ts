@@ -12,6 +12,7 @@ export async function getAllUsers(req: Request, res: Response) {
         nombre: true,
         email: true,
         telefono: true,
+        role: true
     }});
     return res.json(users);
   } catch (error) {

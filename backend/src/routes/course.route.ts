@@ -1,7 +1,13 @@
 import express from "express";
-import { getCourses } from "../controllers/course.controller";
+import { createCourse, getCourseById, getCourses } from "../controllers/course.controller";
+import { adminMiddleware } from "../middleware/admin.middleware";
+
 const router = express.Router();
 
-router.get("/", getCourses)
+// GET /courses
+router.get("/", getCourses);
+router.get("/:id", getCourseById);
+// POST /courses — admin only
+router.post("/", adminMiddleware, createCourse);
 
 export default router;
